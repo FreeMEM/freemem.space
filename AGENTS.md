@@ -9,7 +9,7 @@ contenido y Next.js como web pública. Mismo patrón que
 - Producción: CT 126 de cosmos (`10.0.0.26`), en `/root/freemem.space`, con
   `docker compose -f docker-compose.yml -f docker-compose.prod.yml`.
 - El balanceador (CT 101, haproxy) entra por el `9443` con PROXY protocol y por el `80`.
-- El correo de WordPress sale por hermes (CT 100, `10.0.0.10:587`).
+- El correo de WordPress sale por hermes (CT 100, `10.0.0.10:587`) como no-reply@freemem.space, la misma cuenta que usa DPMS (CT 104): si se cambia su contraseña, hay que cambiarla en los dos.
 - Se entra con `ssh root@cosmos.freemem.space "pct exec 126 -- …"`. El CT no tiene SSH.
 
 ## Por qué está hecho así

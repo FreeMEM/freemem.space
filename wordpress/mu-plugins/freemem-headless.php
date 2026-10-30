@@ -35,7 +35,7 @@ add_action('phpmailer_init', function ($m) {
     $m->SMTPOptions = ['ssl' => ['peer_name' => 'hermes.freemem.space', 'verify_peer' => true]];
 });
 
-add_filter('wp_mail_from', fn () => 'devel@freemem.space');
+add_filter('wp_mail_from', fn () => 'no-reply@freemem.space');
 add_filter('wp_mail_from_name', fn () => 'La bitácora de FreeMEM');
 
 // ============ SUPERFICIE ============
