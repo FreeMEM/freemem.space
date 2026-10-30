@@ -29,6 +29,8 @@ set -a; . ./.env; set +a
 DUMP=migracion/blog-latin1.sql
 UPLOADS=migracion/uploads-crudo.tar
 [ -f "$DUMP" ] && [ -f "$UPLOADS" ] || { echo "faltan $DUMP o $UPLOADS"; exit 1; }
+# WP-CLI corre como www-data (33): tiene que poder leerlos
+chgrp -R 33 migracion && chmod -R g+rX migracion
 
 echo "== Instalación limpia"
 if ! wp core is-installed 2>/dev/null; then
@@ -38,7 +40,7 @@ if ! wp core is-installed 2>/dev/null; then
 fi
 wp language core install es_ES --activate
 wp theme install twentytwentyfive --activate
-wp plugin install akismet codecolorer mcp-adapter enable-abilities-for-mcp --activate
+wp plugin install akismet codecolorer resume-builder mcp-adapter enable-abilities-for-mcp --activate
 wp plugin delete hello 2>/dev/null || true
 
 echo "== Base antigua en «antiguo»"
