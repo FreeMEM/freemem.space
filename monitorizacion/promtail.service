@@ -1,0 +1,11 @@
+[Unit]
+Description=promtail: visitas de freemem.space hacia Loki (CT 125)
+After=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/promtail -config.file=/etc/promtail/promtail.yml
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

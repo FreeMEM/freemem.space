@@ -50,6 +50,7 @@ De ahí salen las reglas:
 | `scripts/wordpress_actualizar.sh` | Mantenimiento diario, el mismo de los WordPress de cosmos (copia del CT 105) |
 | `scripts/imagenes_actualizar.sh` | Cada lunes: imágenes de nginx/ModSecurity, MariaDB y certbot, y frontend reconstruido; vuelve atrás si la web falla |
 | `scripts/instalar-mantenimiento.sh` | Instala los dos guiones, WP-CLI, los temporizadores y unattended-upgrades en el CT |
+| `monitorizacion/` | Visitas a Loki: promtail, rotación y el panel «freemem.space / Visitas» de Grafana (vigía) |
 | `.github/dependabot.yml` | Avisos de versiones nuevas de npm y Docker; se fusionan a mano |
 
 ## Frontend

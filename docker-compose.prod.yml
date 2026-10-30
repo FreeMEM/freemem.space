@@ -70,6 +70,8 @@ services:
       - ./certbot/www:/var/www/certbot:ro
       - ./certbot/conf:/etc/letsencrypt:ro
       - wp_data:/var/www/html:ro
+      # visitas.json lo lee promtail en el CT y lo manda a Loki (vigía)
+      - ./registros:/var/log/nginx/visitas
     networks:
       - backend
 

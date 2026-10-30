@@ -28,3 +28,4 @@ frontend/out/
 # Logs
 *.log
 npm-debug.log*
+registros/

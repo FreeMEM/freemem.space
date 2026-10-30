@@ -1,0 +1,26 @@
+# promtail del CT 126: las visitas de freemem.space hacia Loki (vigía, CT 125).
+# Puerto 0 = uno al azar, y solo en 127.0.0.1: así no queda nada escuchando fuera
+# (en cosmos un promtail con lo de por defecto abrió dos puertos, 13/10/2026).
+server:
+  http_listen_address: 127.0.0.1
+  http_listen_port: 0
+  grpc_listen_address: 127.0.0.1
+  grpc_listen_port: 0
+positions:
+  filename: /var/lib/promtail/positions.yaml
+clients:
+  - url: http://10.0.0.25:3100/loki/api/v1/push
+scrape_configs:
+  - job_name: freemem-web
+    static_configs:
+      - targets: [localhost]
+        labels: {job: freemem-web, ct: freememspace, __path__: /root/freemem.space/registros/visitas.json}
+    pipeline_stages:
+      - json:
+          expressions: {t: t, tipo: tipo}
+      # La hora de la petición, no la de lectura; y el tipo como etiqueta (pocos
+      # valores), que es por lo que filtran todos los paneles.
+      - timestamp:
+          source: t
+          format: RFC3339
+      - labels: {tipo: ""}

@@ -25,3 +25,14 @@ systemctl list-timers --no-pager | grep -E 'wordpress|nginx|imagenes'
 DEBIAN_FRONTEND=noninteractive apt-get install -y -qq unattended-upgrades >/dev/null
 printf 'APT::Periodic::Update-Package-Lists "1";\nAPT::Periodic::Unattended-Upgrade "1";\n' > /etc/apt/apt.conf.d/20auto-upgrades
 unattended-upgrade --dry-run >/dev/null && echo 'unattended-upgrades activo'
+
+# Visitas hacia Loki (vigía): promtail, el mismo binario que el resto de cosmos
+# (se copia de otro CT: ssh root@cosmos "pct pull 124 /usr/local/bin/promtail /tmp/promtail
+# && pct push 126 /tmp/promtail /usr/local/bin/promtail -perms 755").
+install -d -o 101 -g 101 -m 750 registros
+install -d /etc/promtail /var/lib/promtail
+install -m 644 monitorizacion/promtail.yml /etc/promtail/promtail.yml
+install -m 644 monitorizacion/promtail.service /etc/systemd/system/promtail.service
+install -m 644 monitorizacion/logrotate-visitas /etc/logrotate.d/freemem-visitas
+systemctl daemon-reload
+[ -x /usr/local/bin/promtail ] && systemctl enable --now promtail && systemctl restart promtail

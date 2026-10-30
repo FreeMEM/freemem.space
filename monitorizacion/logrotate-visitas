@@ -1,0 +1,14 @@
+# /etc/logrotate.d/freemem-visitas: promtail ya lo ha mandado a Loki, aquí basta
+# una semana. nginx (en Docker) reabre el fichero tras rotarlo.
+/root/freemem.space/registros/visitas.json {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 101 101
+    postrotate
+        docker exec freememspace-nginx-1 nginx -s reopen >/dev/null 2>&1 || true
+    endscript
+}
