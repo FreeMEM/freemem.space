@@ -27,7 +27,7 @@ DOMPurify.addHook('afterSanitizeAttributes', nodo => {
     // Las de WordPress pasan por el optimizador de Next.js: AVIF/WebP y a medida
     const src = nodo.getAttribute('src') || ''
     if (/^https:\/\/freemem\.space\/wp-content\/uploads\//.test(src)) {
-      const url = w => `/_next/image?url=${encodeURIComponent(src)}&w=${w}&q=75`
+      const url = w => `/_next/image/?url=${encodeURIComponent(src)}&w=${w}&q=75`
       nodo.setAttribute('src', url(1080))
       nodo.setAttribute('srcset', [640, 828, 1080, 1200].map(w => `${url(w)} ${w}w`).join(', '))
       nodo.setAttribute('sizes', '(max-width: 820px) 100vw, 68ch')
