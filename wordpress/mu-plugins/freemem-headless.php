@@ -75,6 +75,13 @@ add_filter('pre_comment_approved', function ($approved, $data) {
     return $approved === 'spam' || $approved === 'trash' ? $approved : 0;
 }, 99, 2);
 
+// Salud del sitio: las actualizaciones automáticas están apagadas a propósito
+// (DISALLOW_FILE_MODS); las hace cada día scripts/wordpress_actualizar.sh con WP-CLI.
+add_filter('site_status_tests', function ($pruebas) {
+    unset($pruebas['async']['background_updates']);
+    return $pruebas;
+});
+
 // La parte pública de WordPress no existe: quien llegue a ella va al frontend.
 add_action('template_redirect', function () {
     if (is_admin() || wp_doing_ajax() || wp_doing_cron() || (defined('REST_REQUEST') && REST_REQUEST)) {

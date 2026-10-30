@@ -16,6 +16,8 @@ x-wp-entorno: &wp-entorno
     define('DISALLOW_FILE_MODS', true);
     define('AUTOMATIC_UPDATER_DISABLED', true);
     define('WP_POST_REVISIONS', 20);
+    // WP-Cron lo lanza el temporizador del CT cada 10 minutos (wordpress_actualizar.sh cron)
+    define('DISABLE_WP_CRON', true);
     define('FREEMEM_FRONTEND_URL', getenv('FRONTEND_URL') ?: 'http://localhost:3000');
     define('FREEMEM_REVALIDATE_SECRET', getenv('REVALIDATE_SECRET') ?: '');
     define('FREEMEM_SMTP_USER', getenv('SMTP_USER') ?: '');
@@ -54,6 +56,11 @@ services:
       db:
         condition: service_healthy
     environment: *wp-entorno
+    # WordPress se llama a sí mismo (salud del sitio, API, loopback) por su nombre
+    # público: dentro del CT tiene que llegar al nginx de aquí, porque cosmos no hace
+    # NAT loopback y la IP pública no da la vuelta.
+    extra_hosts:
+      - "freemem.space:host-gateway"
     volumes:
       - wp_data:/var/www/html
       - ./wordpress/mu-plugins:/var/www/html/wp-content/mu-plugins:ro
