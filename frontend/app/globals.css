@@ -70,10 +70,14 @@ body {
 }
 
 img,
-video,
-iframe {
+video {
   max-width: 100%;
   height: auto;
+}
+
+/* En un iframe «height: auto» no guarda la proporción: se queda en 150 px */
+iframe {
+  max-width: 100%;
 }
 
 a {
@@ -892,11 +896,26 @@ h4 {
   vertical-align: top;
 }
 
-.texto .video iframe {
+/* Vídeos: los de [youtube] del blog antiguo (figure.video) y los incrustados del
+   editor de bloques (figure.wp-block-embed), a todo el ancho del texto y en 16:9 */
+.texto .video iframe,
+.texto .wp-block-embed iframe,
+.texto iframe[src*="youtube"],
+.texto iframe[src*="vimeo"] {
+  display: block;
   width: 100%;
-  aspect-ratio: 16 / 9;
   height: auto;
+  aspect-ratio: 16 / 9;
   border: 0;
+}
+
+.texto .wp-block-embed {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.texto .wp-embed-aspect-4-3 iframe {
+  aspect-ratio: 4 / 3;
 }
 
 .texto ul,
