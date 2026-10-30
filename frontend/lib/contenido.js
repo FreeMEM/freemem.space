@@ -45,6 +45,20 @@ function youtube(html) {
 }
 
 /**
+ * Algunos [cce_bash] de 2010 no los procesa ya CodeColorer: llegan crudos, con los
+ * <br /> y <p> que añade WordPress. Se pasan a bloque de código a mano.
+ */
+function codigoCrudo(html) {
+  return html.replace(/\[(cce?(?:_\w+)?)(?:\s[^\]]*)?\]([\s\S]*?)\[\/\1\]/g, (_, _tipo, codigo) => {
+    const limpio = codigo
+      .replace(/<br\s*\/?>\n?/g, '\n')
+      .replace(/<\/?p[^>]*>/g, '\n')
+      .replace(/^\n+|\n+$/g, '')
+    return `<pre class="codigo"><code>${limpio}</code></pre>`
+  })
+}
+
+/**
  * CodeColorer pinta una tabla con números de línea y <br /> en cada línea, y el
  * editor nuevo lo mete además dentro de un <pre>: salían líneas en blanco de más.
  * Se reduce a <pre><code> normal. Los [cc] que estaban en mitad de una frase (una
@@ -86,7 +100,7 @@ function slugTitulo(texto) {
 export function prepararContenido(html) {
   const indice = []
   const usados = new Set()
-  const listo = limpiar(codecolorer(youtube(html || ''))).replace(/<h([23])([^>]*)>([\s\S]*?)<\/h\1>/g, (todo, nivel, attrs, dentro) => {
+  const listo = limpiar(codecolorer(codigoCrudo(youtube(html || '')))).replace(/<h([23])([^>]*)>([\s\S]*?)<\/h\1>/g, (todo, nivel, attrs, dentro) => {
     const texto = textoPlano(dentro)
     if (!texto) return todo
     let id = /id="([^"]+)"/.exec(attrs)?.[1] || slugTitulo(texto) || `seccion-${indice.length + 1}`
