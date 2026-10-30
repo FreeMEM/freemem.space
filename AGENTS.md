@@ -40,6 +40,8 @@ De ahí salen las reglas:
 | `wordpress/mu-plugins/freemem-headless.php` | Correo, API acotada, aviso a Next.js al publicar |
 | `frontend/` | Next.js 15 (App Router), CSS propio, sin librería de componentes |
 | `scripts/migrar.sh` | Migración única desde el sitio antiguo. Ya está hecha |
+| `scripts/wordpress_actualizar.sh` | Mantenimiento diario, el mismo de los WordPress de cosmos (copia del CT 105) |
+| `scripts/instalar-mantenimiento.sh` | Instala ese guion, WP-CLI y los temporizadores en el CT |
 
 ## Frontend
 

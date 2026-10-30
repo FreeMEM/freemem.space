@@ -1,0 +1,10 @@
+[Unit]
+Description=Cada 10 minutos: WP-Cron
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=10min
+RandomizedDelaySec=60
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,8 @@
+[Unit]
+Description=WordPress: copia, actualizaciones, prueba e integridad
+After=docker.service mariadb.service mysql.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/wordpress_actualizar.sh
+TimeoutStartSec=1800

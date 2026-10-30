@@ -1,0 +1,7 @@
+[Unit]
+Description=freemem.space: recarga nginx para que tome los certificados renovados
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/freemem.space
+ExecStart=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T nginx nginx -s reload

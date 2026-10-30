@@ -1,0 +1,11 @@
+[Unit]
+Description=Diario: mantenimiento de WordPress
+
+[Timer]
+# Después de unattended-upgrades (~06:00) para no pelear por el disco.
+OnCalendar=*-*-* 07:15:00
+RandomizedDelaySec=900
+Persistent=true
+
+[Install]
+WantedBy=timers.target

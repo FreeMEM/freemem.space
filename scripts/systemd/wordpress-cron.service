@@ -1,0 +1,7 @@
+[Unit]
+Description=Tareas pendientes de WP-Cron (WordPress no puede dispararlas solo desde cosmos)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/wordpress_actualizar.sh cron
+TimeoutStartSec=600

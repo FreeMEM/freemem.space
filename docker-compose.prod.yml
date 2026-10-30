@@ -75,4 +75,6 @@ services:
     volumes:
       - ./certbot/www:/var/www/certbot
       - ./certbot/conf:/etc/letsencrypt
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    # nginx (imagen CRS) corre como uid 101 y certbot deja las claves en 600: se le da
+    # lectura por grupo al renovar. La recarga de nginx la hace un temporizador del CT.
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --deploy-hook \"chgrp 101 /etc/letsencrypt/archive/*/privkey*.pem; chmod 640 /etc/letsencrypt/archive/*/privkey*.pem\"; sleep 12h & wait $${!}; done;'"
