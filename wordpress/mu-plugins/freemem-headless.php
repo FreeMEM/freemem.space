@@ -92,7 +92,7 @@ function freemem_revalidar($motivo, $ruta = null) {
     if (!FREEMEM_REVALIDATE_SECRET) {
         return;
     }
-    $url = getenv('REVALIDATE_URL') ?: 'http://frontend:3000/api/revalidate';
+    $url = getenv('REVALIDATE_URL') ?: 'http://frontend:3000/api/revalidate/';
     wp_remote_post($url, [
         'timeout'  => 3,
         'blocking' => false,
