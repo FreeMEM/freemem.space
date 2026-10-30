@@ -6,6 +6,10 @@ const nextConfig = {
   // tal cual para no romper enlaces ni lo que tenga indexado Google.
   trailingSlash: true,
   poweredByHeader: false,
+  // Comprime nginx (también lo cacheado); comprimir dos veces solo gasta CPU
+  compress: false,
+  // 6 KB de CSS: dentro del HTML se ahorra una petición que bloquea el primer pintado
+  experimental: { inlineCss: true },
   // Las imágenes de WordPress (PNG y JPG de hasta 2 MB) salen en AVIF o WebP y al
   // tamaño de cada pantalla. El optimizador las pide a https://freemem.space, que
   // dentro del CT apunta al propio nginx (extra_hosts en docker-compose.prod.yml).

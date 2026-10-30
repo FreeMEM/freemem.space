@@ -87,7 +87,7 @@ export default async function Entrada({ params }) {
 
       {e.imagen && (
         <figure className="imagen-entrada">
-          <Image src={e.imagen.src} sizes="100vw" alt={e.imagen.alt} width={e.imagen.ancho} height={e.imagen.alto} priority />
+          <Image src={e.imagen.src} sizes="100vw" alt={e.imagen.alt} width={e.imagen.ancho} height={e.imagen.alto} priority fetchPriority="high" loading="eager" />
         </figure>
       )}
 

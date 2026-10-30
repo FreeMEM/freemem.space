@@ -26,6 +26,8 @@ export default function Portada({ entrada }) {
             width={entrada.imagen.ancho}
             height={entrada.imagen.alto}
             priority
+            fetchPriority="high"
+            loading="eager"
           />
         </figure>
       )}
