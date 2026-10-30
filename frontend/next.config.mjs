@@ -16,9 +16,13 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'freemem.space', pathname: '/wp-content/uploads/**' },
-      { protocol: 'http', hostname: 'localhost', port: '8080', pathname: '/wp-content/uploads/**' },
+      ...(process.env.NODE_ENV === 'production'
+        ? []
+        : [{ protocol: 'http', hostname: 'localhost', port: '8080', pathname: '/wp-content/uploads/**' }]),
     ],
     formats: ['image/avif', 'image/webp'],
+    // Solo una calidad: con cualquiera, alguien podría llenar la caché de variantes
+    qualities: [75],
     minimumCacheTTL: 2592000,
   },
   // En desarrollo el formulario de comentarios llama a /wp-json/ del propio
