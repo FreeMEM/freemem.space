@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Output standalone para Docker
@@ -31,16 +33,19 @@ const nextConfig = {
   // trimStart…) en el JS principal. Los navegadores de «browserslist» (Chrome 111,
   // Safari 16.4…) ya los traen: son 12 KB que solo se descargan. Los navegadores
   // viejos siguen teniendo polyfills-*.js, que Next carga aparte con nomodule.
-  webpack(config, { isServer }) {
+  webpack(config, { isServer, webpack }) {
     if (!isServer) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        'next/dist/build/polyfills/polyfill-module': false,
-        '../build/polyfills/polyfill-module': false,
-      }
+      // Se importa con ruta relativa desde next/dist/client: un alias no lo atrapa
+      config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(/[\\/]build[\\/]polyfills[\\/]polyfill-module/, fileURLToPath(new URL('./lib/vacio.js', import.meta.url)))
+      )
     }
     return config
   },
+  // Next.js 15.5 manda los metadatos (title, description…) al final de la página a
+  // quien no reconoce como buscador. Google los ve, pero otros lectores no: siempre
+  // en la cabecera.
+  htmlLimitedBots: /.*/,
   async rewrites() {
     if (process.env.NODE_ENV === 'production') return []
     const api = process.env.WORDPRESS_API_URL || 'http://localhost:8080/wp-json'
