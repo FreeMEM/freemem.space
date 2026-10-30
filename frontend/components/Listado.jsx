@@ -3,7 +3,7 @@ import Lateral from './Lateral'
 import Registro from './Registro'
 import Paginas from './Paginas'
 import Portada from './Portada'
-import { getCategorias, getEntradas } from '@/lib/wordpress'
+import { getCategorias, getEntradas, getSitio } from '@/lib/wordpress'
 
 /**
  * Portada, categorías, etiquetas y búsqueda comparten esta vista. En la primera
@@ -11,7 +11,7 @@ import { getCategorias, getEntradas } from '@/lib/wordpress'
  */
 export default async function Listado({ pagina = 1, base = '/', filtro = {}, cabeza = null, actual, conPortada = false }) {
   if (!Number.isInteger(pagina) || pagina < 1) notFound()
-  const [{ entradas, paginas }, categorias] = await Promise.all([getEntradas({ pagina, ...filtro }), getCategorias()])
+  const [{ entradas, paginas }, categorias, sitio] = await Promise.all([getEntradas({ pagina, ...filtro }), getCategorias(), getSitio()])
   if (pagina > 1 && !entradas.length) notFound()
 
   const destacada = conPortada && pagina === 1 ? entradas[0] : null
@@ -21,7 +21,7 @@ export default async function Listado({ pagina = 1, base = '/', filtro = {}, cab
     <>
       {destacada && <Portada entrada={destacada} />}
       <div className="lienzo">
-        <Lateral categorias={categorias} actual={actual} />
+        <Lateral sitio={sitio} categorias={categorias} actual={actual} />
         <div>
           {cabeza}
           {resto.length ? (

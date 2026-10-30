@@ -33,7 +33,7 @@ export default async function RootLayout({ children }) {
     <html lang="es" className={`${bricolage.variable} ${literata.variable} ${jetbrains.variable}`}>
       <body>
         <a className="saltar" href="#contenido">Saltar al contenido</a>
-        <Cabecera categorias={categorias} />
+        <Cabecera sitio={sitio} />
         <main id="contenido">{children}</main>
         <Pie sitio={sitio} categorias={categorias} />
       </body>

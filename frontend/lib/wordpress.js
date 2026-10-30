@@ -120,10 +120,13 @@ export async function getComentarios(postId) {
 }
 
 export async function getSitio() {
-  const { data } = await fetchWP('/', { revalidate: 3600 })
+  const { data } = await fetchWP('/freemem/v1/sitio', { revalidate: 3600 })
   return {
-    nombre: data?.name || 'La bitácora de FreeMEM',
-    descripcion: data?.description || '',
+    nombre: data?.nombre || 'La bitácora de FreeMEM by Francisco Tapias Bravo',
+    descripcion: data?.descripcion || '',
+    menu: data?.menu || [],
+    paginas: data?.paginas || [],
+    retrato: data?.retrato || null,
   }
 }
 

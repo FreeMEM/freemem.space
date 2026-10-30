@@ -115,3 +115,41 @@ add_action('wp_set_comment_status', function ($id) {
 foreach (['edited_term', 'created_term', 'delete_term', 'wp_update_nav_menu'] as $gancho) {
     add_action($gancho, fn () => freemem_revalidar('estructura'));
 }
+
+// ============ LO QUE PINTA EL FRONTEND ALREDEDOR DEL CONTENIDO ============
+
+// El menú de siempre («Menú 1»), las páginas y el retrato del lateral, en una sola
+// llamada pública: los menús de la API estándar piden sesión.
+add_action('rest_api_init', function () {
+    register_rest_route('freemem/v1', '/sitio', [
+        'methods'             => 'GET',
+        'permission_callback' => '__return_true',
+        'callback'            => function () {
+            $ruta = fn ($url) => wp_make_link_relative($url) ?: '/';
+            $menu = [];
+            $locs = get_nav_menu_locations();
+            $id   = $locs ? reset($locs) : 0;
+            $obj  = wp_get_nav_menu_object($id ?: 'Menú 1');
+            foreach ($obj ? wp_get_nav_menu_items($obj->term_id) : [] as $i) {
+                $menu[] = ['titulo' => $i->title, 'ruta' => $ruta($i->url)];
+            }
+            $paginas = [];
+            foreach (get_pages(['sort_column' => 'post_title']) as $p) {
+                $paginas[] = ['titulo' => $p->post_title, 'ruta' => $ruta(get_permalink($p))];
+            }
+            $retrato = (int) get_option('freemem_retrato');
+            $img = $retrato ? wp_get_attachment_image_src($retrato, 'large') : null;
+            return [
+                'nombre'      => get_bloginfo('name'),
+                'descripcion' => get_bloginfo('description'),
+                'menu'        => $menu,
+                'paginas'     => $paginas,
+                'retrato'     => $img ? ['src' => $img[0], 'ancho' => $img[1], 'alto' => $img[2]] : null,
+            ];
+        },
+    ]);
+});
+
+foreach (['wp_update_nav_menu', 'update_option_freemem_retrato', 'update_option_blogname', 'update_option_blogdescription'] as $gancho) {
+    add_action($gancho, fn () => freemem_revalidar('sitio'));
+}
