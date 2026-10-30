@@ -21,6 +21,9 @@ services:
         # interna, sin pasar por el balanceador ni el WAF.
         WORDPRESS_API_URL: http://nginx:8081/wp-json
         NEXT_PUBLIC_SITE_URL: ${WP_HOME:-https://freemem.space}
+        # Google Analytics 4 de freemem.space (el de Site Kit en el sitio antiguo).
+        # No es secreto: va en el HTML. Solo se carga si el visitante acepta.
+        NEXT_PUBLIC_GA_ID: ${GA_ID:-G-K9SH40W4GY}
     restart: unless-stopped
     logging: *logs
     depends_on:

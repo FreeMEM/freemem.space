@@ -61,7 +61,11 @@ De ahí salen las reglas:
 - Diseño: azul (#0055AA) y naranja (#FF8800) del Workbench 1.3. Titulares en
   Bricolage Grotesque y texto en Literata. Las copper bars de la portada son el único
   adorno, y el Guru Meditation solo sale en la página 404.
-- Hay entradas desde 2006, con shortcodes viejos: `[youtube]` se convierte en
+- Google Analytics 4 (`G-K9SH40W4GY`) solo carga si el visitante acepta en el aviso
+  (`components/Analitica.jsx`). Search Console se verifica con
+  `public/google0ac0168ea35fcffb.html`, el fichero que puso Site Kit: no borrarlo.
+- Para modelos de lenguaje: `/llms.txt`, `/llms-full.txt` y `/<slug>/index.md`.
+- Hay entradas desde 2004 (las de 2004-2006 rescatadas del Mambo de old.tapiasbravo.com), con shortcodes viejos: `[youtube]` se convierte en
   `lib/contenido.js` y los de CodeColorer los pinta el plugin.
 
 ## Desarrollo

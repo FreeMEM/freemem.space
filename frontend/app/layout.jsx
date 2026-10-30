@@ -1,6 +1,7 @@
 import { Bricolage_Grotesque, Literata, JetBrains_Mono } from 'next/font/google'
 import Cabecera from '@/components/Cabecera'
 import Pie from '@/components/Pie'
+import Analitica from '@/components/Analitica'
 import { getCategorias, getSitio, SITE_URL } from '@/lib/wordpress'
 import './globals.css'
 
@@ -37,6 +38,7 @@ export default async function RootLayout({ children }) {
         <Cabecera sitio={sitio} />
         <main id="contenido">{children}</main>
         <Pie sitio={sitio} categorias={categorias} />
+        <Analitica />
       </body>
     </html>
   )

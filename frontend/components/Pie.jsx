@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { textoPlano } from '@/lib/contenido'
+import EnlaceCookies from './EnlaceCookies'
 
 export default function Pie({ sitio, categorias }) {
   return (
@@ -28,6 +29,7 @@ export default function Pie({ sitio, categorias }) {
           <li><Link href="/aviso-legal/">Aviso legal</Link></li>
           <li><Link href="/politica-de-privacidad/">Privacidad</Link></li>
           <li><Link href="/politica-de-cookies/">Cookies</Link></li>
+          <li><EnlaceCookies /></li>
         </ul>
       </div>
     </footer>

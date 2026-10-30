@@ -1288,3 +1288,58 @@ h4 {
 .texto--cv .rbt-history-description {
   font-size: 1.04rem;
 }
+
+/* ============ AVISO DE COOKIES ============ */
+
+.aviso-cookies {
+  position: fixed;
+  left: var(--margen);
+  right: var(--margen);
+  bottom: 1rem;
+  z-index: 20;
+  max-width: 44rem;
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  background: var(--tinta);
+  color: var(--papel);
+  padding: 1rem 1.25rem;
+  border-left: 6px solid var(--wb-naranja);
+  font-family: var(--f-titulo);
+  font-size: 0.98rem;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+  .aviso-cookies {
+    background: #061629;
+    color: var(--tinta);
+  }
+}
+
+.aviso-cookies p {
+  margin: 0;
+  flex: 1 1 18rem;
+}
+
+.aviso-cookies a {
+  color: inherit;
+}
+
+.aviso-cookies div {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.enlace-boton {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
