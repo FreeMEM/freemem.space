@@ -72,6 +72,7 @@ export default async function Entrada({ params }) {
         {esEntrada && (
           <p className="cabeza-entrada__meta">
             <time dateTime={e.fecha}>{formatoFecha(e.fecha)}</time>
+            {!/Tapias/.test(e.autor) && <span>Escrito por {e.autor}</span>}
             <span>{minutosLectura(e.contenido)} min de lectura</span>
             {e.categorias.map(c => (
               <Link key={c.id} href={`/category/${c.slug}/`}>
