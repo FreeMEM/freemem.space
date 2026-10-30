@@ -329,7 +329,7 @@ h4 {
     min-height: auto;
   }
   .portada__texto {
-    padding-bottom: 2rem;
+    padding-bottom: calc(clamp(4rem, 9vw, 8rem) + 1.5rem);
   }
   .portada__imagen {
     order: -1;
@@ -362,6 +362,7 @@ h4 {
 @media (max-width: 960px) {
   .lateral {
     position: static;
+    order: 1;
   }
 }
 
@@ -574,7 +575,7 @@ h4 {
 .imagen-entrada img {
   display: block;
   width: 100%;
-  max-height: 72vh;
+  max-height: 56vh;
   object-fit: cover;
   margin-bottom: calc(-1 * var(--hueco));
   position: relative;

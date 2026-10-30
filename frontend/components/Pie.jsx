@@ -11,7 +11,7 @@ export default function Pie({ sitio, categorias }) {
       <div>
         <h2>Temas</h2>
         <ul>
-          {categorias.slice(0, 8).map(c => (
+          {categorias.filter(c => c.slug !== 'portada').slice(0, 8).map(c => (
             <li key={c.id}>
               <Link href={`/category/${c.slug}/`}>{c.nombre}</Link>
             </li>

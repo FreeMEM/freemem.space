@@ -7,7 +7,7 @@ export default function Cabecera({ categorias }) {
       <Link href="/" className="marca">
         FreeMEM <span>bitácora</span>
       </Link>
-      <Temas categorias={categorias.slice(0, 7)} />
+      <Temas categorias={categorias.filter(c => c.slug !== 'portada').slice(0, 7)} />
       <form className="busqueda" action="/buscar/" role="search">
         <input type="search" name="q" placeholder="Buscar en la bitácora" aria-label="Buscar en la bitácora" />
       </form>

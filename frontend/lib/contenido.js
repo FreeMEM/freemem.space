@@ -44,6 +44,29 @@ function youtube(html) {
   )
 }
 
+/**
+ * CodeColorer pinta una tabla con números de línea y <br /> en cada línea, y el
+ * editor nuevo lo mete además dentro de un <pre>: salían líneas en blanco de más.
+ * Se reduce a <pre><code> normal. Los [cc] que estaban en mitad de una frase (una
+ * sola línea, sin <pre> alrededor) pasan a <code> en línea, como se pensaron.
+ */
+function codecolorer(html) {
+  return html.replace(
+    /(<pre[^>]*>\s*)?<div class="codecolorer-container[^"]*"[^>]*>[\s\S]*?<div class="[^"]*\bcodecolorer">([\s\S]*?)<\/div>(?:<\/td><\/tr><\/tbody><\/table>)?<\/div>(\s*<\/pre>)?/g,
+    (_, preAntes, codigo, preDespues) => {
+      const limpio = codigo.replace(/<br\s*\/?>\n?/g, '\n').replace(/&nbsp;/g, ' ').replace(/\n+$/, '')
+      if (!preAntes && !preDespues && !limpio.includes('\n') && limpio.length < 80) {
+        return `<code>${limpio.trim()}</code>`
+      }
+      return `<pre class="codigo"><code>${limpio}</code></pre>`
+    }
+  ).replace(
+    // El editor partió esas frases en párrafos alrededor del código: se vuelven a unir
+    /<\/p>\s*(<code>[^<]*<\/code>)\s*<p[^>]*>(\s*[,.;:)!?])?/g,
+    (_, codigo, signo) => ` ${codigo}${signo ? signo.trim() : ' '}`
+  )
+}
+
 function slugTitulo(texto) {
   return texto
     .toLowerCase()
@@ -63,7 +86,7 @@ function slugTitulo(texto) {
 export function prepararContenido(html) {
   const indice = []
   const usados = new Set()
-  const listo = limpiar(youtube(html || '')).replace(/<h([23])([^>]*)>([\s\S]*?)<\/h\1>/g, (todo, nivel, attrs, dentro) => {
+  const listo = limpiar(codecolorer(youtube(html || ''))).replace(/<h([23])([^>]*)>([\s\S]*?)<\/h\1>/g, (todo, nivel, attrs, dentro) => {
     const texto = textoPlano(dentro)
     if (!texto) return todo
     let id = /id="([^"]+)"/.exec(attrs)?.[1] || slugTitulo(texto) || `seccion-${indice.length + 1}`
