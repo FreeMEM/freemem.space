@@ -31,6 +31,11 @@ De ahí salen las reglas:
   imagen de PHP los domingos; nginx con ModSecurity, MariaDB, certbot y el frontend
   los lunes; el sistema del CT con unattended-upgrades. Las dos pasadas comprueban la
   web y vuelven atrás si falla. La integridad diaria la recoge la alerta de cosmos.
+- **Tras cambiar `nginx/site.conf`, `restart nginx`, no `nginx -s reload`**: va montado
+  como fichero suelto y `git pull` lo sustituye por otro; el contenedor sigue viendo el
+  viejo hasta que se reinicia. Antes, `exec nginx nginx -t` no sirve por lo mismo.
+- **Caché**: nginx guarda las páginas 60 s (renovación en segundo plano) y `/_next/`
+  30 días. Lo publicado tarda como mucho un minuto en verse. `X-Cache` dice HIT o MISS.
 - **En producción, `docker compose` siempre con los dos ficheros**
   (`-f docker-compose.yml -f docker-compose.prod.yml`): con uno solo, Docker recrea
   la base y WordPress con otra configuración.
