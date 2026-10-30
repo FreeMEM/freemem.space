@@ -57,6 +57,11 @@ add_filter('rest_endpoints', function ($endpoints) {
 add_action('rest_api_init', function () {
     register_rest_field(['post', 'page'], 'freemem_autor', [
         'get_callback' => function ($post) {
+            // Las entradas rescatadas del Mambo que escribieron otros guardan su autor
+            $original = get_post_meta($post['id'], '_autor_original', true);
+            if ($original) {
+                return ['nombre' => $original];
+            }
             $u = get_userdata($post['author']);
             return $u ? ['nombre' => $u->display_name] : null;
         },

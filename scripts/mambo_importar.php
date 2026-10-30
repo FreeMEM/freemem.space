@@ -58,7 +58,7 @@ foreach ($unicas as $p) {
     // Enlaces a otras partes de aquel Mambo (contacto, secciones): se queda el texto
     $html = preg_replace('#<a href="https?://(?:old\.|www\.)?tapiasbravo\.com/index\.php\?option=(?!com_content|content)[^"]*">(.*?)</a>#is', '$1', $html);
     // Sin texto que leer (pruebas, o solo un banner que ya no existe): no se importa
-    if (mb_strlen(trim(wp_strip_all_tags($html))) < 60 && !str_contains($html, '<a ')) {
+    if (mb_strlen(trim(wp_strip_all_tags($html))) < 60) {
         WP_CLI::log('Sin contenido, no se importa: ' . $p['titulo']);
         continue;
     }
@@ -82,7 +82,7 @@ foreach ($unicas as $p) {
         'post_category'  => [$cat_id],
         'comment_status' => 'closed',
         'ping_status'    => 'closed',
-        'meta_input'     => ['_mambo_id' => $mambo_id, '_mambo_captura' => $p['captura'], '_mambo_origen' => $p['tipo'] . '-' . ($p['id'] ?? '')],
+        'meta_input'     => array_filter(['_autor_original' => in_array(mb_strtolower($autor), $mios, true) ? '' : $autor]) + ['_mambo_id' => $mambo_id, '_mambo_captura' => $p['captura'], '_mambo_origen' => $p['tipo'] . '-' . ($p['id'] ?? '')],
     ], true);
 
     if (is_wp_error($id)) {
