@@ -75,6 +75,8 @@ services:
     user: "33:33"
     depends_on:
       - db
+    extra_hosts:
+      - "freemem.space:host-gateway"
     environment: *wp-entorno
     volumes:
       - wp_data:/var/www/html
