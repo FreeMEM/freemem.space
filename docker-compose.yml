@@ -1,0 +1,87 @@
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  wordpress:
+    image: wordpress:php8.3-fpm  # sin versión de WordPress: el núcleo vive en el volumen y lo actualiza WP-CLI; la etiqueta solo fija PHP
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_HOME', getenv('WP_HOME') ?: 'http://localhost:8080');
+        define('WP_SITEURL', getenv('WP_HOME') ?: 'http://localhost:8080');
+        // Nada se instala ni se edita desde wp-admin: plugins, temas y núcleo
+        // solo cambian con WP-CLI (scripts/wordpress_actualizar.sh). Tras la
+        // intrusión de 2026 el PHP que escribe la web es lo primero que se cierra.
+        define('DISALLOW_FILE_EDIT', true);
+        define('DISALLOW_FILE_MODS', true);
+        define('AUTOMATIC_UPDATER_DISABLED', true);
+        define('WP_POST_REVISIONS', 20);
+        define('FREEMEM_FRONTEND_URL', getenv('FRONTEND_URL') ?: 'http://localhost:3000');
+        define('FREEMEM_REVALIDATE_SECRET', getenv('REVALIDATE_SECRET') ?: '');
+        define('FREEMEM_SMTP_USER', getenv('SMTP_USER') ?: '');
+        define('FREEMEM_SMTP_PASS', getenv('SMTP_PASS') ?: '');
+      WP_HOME: ${WP_HOME:-http://localhost:8080}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+    volumes:
+      - wp_data:/var/www/html
+      - ./wordpress/mu-plugins:/var/www/html/wp-content/mu-plugins:ro
+      - ./wordpress/uploads.ini:/usr/local/etc/php/conf.d/zzz-uploads.ini:ro
+    networks:
+      - backend
+
+  # WP-CLI para mantenimiento: docker compose run --rm wpcli <orden>
+  wpcli:
+    image: wordpress:cli-php8.3
+    profiles: ["cli"]
+    user: "33:33"
+    depends_on:
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WP_HOME: ${WP_HOME:-http://localhost:8080}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+    volumes:
+      - wp_data:/var/www/html
+      - ./wordpress/mu-plugins:/var/www/html/wp-content/mu-plugins:ro
+      - ./migracion:/migracion:ro
+    networks:
+      - backend
+
+networks:
+  backend:
+
+volumes:
+  db_data:
+  wp_data:

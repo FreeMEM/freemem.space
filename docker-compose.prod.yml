@@ -1,0 +1,78 @@
+# Producción - Usar con:
+# docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  wordpress:
+    logging: &logs
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  db:
+    logging: *logs
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # En la construcción Next.js genera las páginas leyendo la API por la red
+        # interna, sin pasar por el balanceador ni el WAF.
+        WORDPRESS_API_URL: http://nginx:8081/wp-json
+        NEXT_PUBLIC_SITE_URL: ${WP_HOME:-https://freemem.space}
+    restart: unless-stopped
+    logging: *logs
+    depends_on:
+      - wordpress
+    environment:
+      - WORDPRESS_API_URL=http://nginx:8081/wp-json
+      - NEXT_PUBLIC_SITE_URL=${WP_HOME:-https://freemem.space}
+      - REVALIDATE_SECRET=${REVALIDATE_SECRET}
+    networks:
+      - backend
+
+  nginx:
+    image: owasp/modsecurity-crs:4.25-nginx-alpine-lts
+    logging: *logs
+    restart: unless-stopped
+    depends_on:
+      - wordpress
+    ports:
+      - "80:80"
+      - "443:443"
+      - "9443:9443"
+    environment:
+      - MODSEC_RULE_ENGINE=On
+      - MODSEC_AUDIT_LOG=/dev/stdout
+      - BLOCKING_PARANOIA=1
+      # Desactiva la inspeccion del cuerpo de respuesta: el buffering de
+      # libmodsecurity rompe el framing HTTP/2 (ERR_HTTP2_PROTOCOL_ERROR)
+      # en respuestas generadas por PHP como /wp-admin/. Mantiene el WAF de entrada.
+      - MODSEC_RESP_BODY_ACCESS=Off
+      - ALLOWED_METHODS=GET HEAD POST OPTIONS PUT DELETE
+      - MAX_FILE_SIZE=67108864
+      - MODSEC_REQ_BODY_LIMIT=67108864
+      - MODSEC_REQ_BODY_LIMIT_ACTION=ProcessPartial
+      - MAX_NUM_ARGS=512
+      - ARG_LENGTH=8000
+      - TOTAL_ARG_LENGTH=64000
+    volumes:
+      - ./nginx/site.conf:/etc/nginx/conf.d/site.conf:ro
+      - ./nginx/modsecurity/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:ro
+      - ./nginx/modsecurity/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:ro
+      - ./nginx/modsecurity/plugins/wordpress-rule-exclusions-config.conf:/etc/modsecurity.d/owasp-crs/plugins/wordpress-rule-exclusions-config.conf:ro
+      - ./nginx/modsecurity/plugins/wordpress-rule-exclusions-before.conf:/etc/modsecurity.d/owasp-crs/plugins/wordpress-rule-exclusions-before.conf:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - wp_data:/var/www/html:ro
+    networks:
+      - backend
+
+  certbot:
+    image: certbot/certbot
+    logging: *logs
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"

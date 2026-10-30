@@ -1,0 +1,30 @@
+# Entorno
+.env
+.env.prod
+.env.local
+
+# Datos de la migración (base y uploads del sitio antiguo): nunca al repo
+migracion/
+
+# Certificados SSL
+certbot/conf/
+certbot/www/
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*

@@ -1,0 +1,109 @@
+<?php
+/*
+Plugin Name: freemem.space headless
+Description: WordPress solo como gestor de contenido: correo por hermes, API acotada y aviso a Next.js al publicar.
+*/
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+// ============ CORREO ============
+
+// El correo sale por hermes (CT 100) a su IP interna: desde dentro de cosmos,
+// mail.tapiasbravo.com (la IP pública) da con el Postfix de cosmos, que no acepta
+// cuentas. El certificado se comprueba igual, con el nombre que hermes presenta.
+add_action('phpmailer_init', function ($m) {
+    if (!FREEMEM_SMTP_USER || !FREEMEM_SMTP_PASS) {
+        return;
+    }
+    $m->isSMTP();
+    $m->Host        = '10.0.0.10';
+    $m->Port        = 587;
+    $m->SMTPSecure  = 'tls';
+    $m->SMTPAuth    = true;
+    $m->Username    = FREEMEM_SMTP_USER;
+    $m->Password    = FREEMEM_SMTP_PASS;
+    $m->SMTPOptions = ['ssl' => ['peer_name' => 'hermes.freemem.space', 'verify_peer' => true]];
+});
+
+add_filter('wp_mail_from', fn () => 'devel@freemem.space');
+add_filter('wp_mail_from_name', fn () => 'La bitácora de FreeMEM');
+
+// ============ SUPERFICIE ============
+
+add_filter('xmlrpc_enabled', '__return_false');
+add_filter('xmlrpc_methods', fn () => []);
+
+// Sin listado de usuarios para quien no ha iniciado sesión: evita que se saquen
+// los nombres de cuenta. El frontend pinta el autor con lo que trae la entrada.
+add_filter('rest_endpoints', function ($endpoints) {
+    if (is_user_logged_in()) {
+        return $endpoints;
+    }
+    unset($endpoints['/wp/v2/users'], $endpoints['/wp/v2/users/(?P<id>[\d]+)']);
+    return $endpoints;
+});
+
+// El nombre público del autor viaja con cada entrada, ya que /users está cerrado.
+add_action('rest_api_init', function () {
+    register_rest_field(['post', 'page'], 'freemem_autor', [
+        'get_callback' => function ($post) {
+            $u = get_userdata($post['author']);
+            return $u ? ['nombre' => $u->display_name] : null;
+        },
+        'schema' => ['type' => 'object', 'context' => ['view']],
+    ]);
+});
+
+// Comentarios desde el frontend sin cuenta, siempre a moderación.
+add_filter('rest_allow_anonymous_comments', '__return_true');
+add_filter('pre_comment_approved', function ($approved, $data) {
+    return $approved === 'spam' || $approved === 'trash' ? $approved : 0;
+}, 99, 2);
+
+// La parte pública de WordPress no existe: quien llegue a ella va al frontend.
+add_action('template_redirect', function () {
+    if (is_admin() || wp_doing_ajax() || wp_doing_cron() || (defined('REST_REQUEST') && REST_REQUEST)) {
+        return;
+    }
+    wp_redirect(FREEMEM_FRONTEND_URL . ($_SERVER['REQUEST_URI'] ?? '/'), 301);
+    exit;
+});
+
+// ============ AVISO A NEXT.JS ============
+
+// Al publicar, cambiar o borrar contenido se avisa al frontend para que rehaga
+// las páginas afectadas sin esperar a que caduque su caché.
+function freemem_revalidar($motivo, $ruta = null) {
+    if (!FREEMEM_REVALIDATE_SECRET) {
+        return;
+    }
+    $url = getenv('REVALIDATE_URL') ?: 'http://frontend:3000/api/revalidate';
+    wp_remote_post($url, [
+        'timeout'  => 3,
+        'blocking' => false,
+        'headers'  => ['Content-Type' => 'application/json', 'X-Revalidate-Secret' => FREEMEM_REVALIDATE_SECRET],
+        'body'     => wp_json_encode(['motivo' => $motivo, 'ruta' => $ruta]),
+    ]);
+}
+
+add_action('transition_post_status', function ($nuevo, $viejo, $post) {
+    if (!in_array($post->post_type, ['post', 'page'], true)) {
+        return;
+    }
+    if ($nuevo === 'publish' || $viejo === 'publish') {
+        freemem_revalidar('entrada', '/' . $post->post_name . '/');
+    }
+}, 10, 3);
+
+add_action('wp_set_comment_status', function ($id) {
+    $c = get_comment($id);
+    if ($c) {
+        freemem_revalidar('comentario', '/' . get_post_field('post_name', $c->comment_post_ID) . '/');
+    }
+});
+
+foreach (['edited_term', 'created_term', 'delete_term', 'wp_update_nav_menu'] as $gancho) {
+    add_action($gancho, fn () => freemem_revalidar('estructura'));
+}
