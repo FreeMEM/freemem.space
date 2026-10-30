@@ -61,6 +61,7 @@ services:
       - ./nginx/site.conf:/etc/nginx/conf.d/site.conf:ro
       - ./nginx/modsecurity/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:ro
       - ./nginx/modsecurity/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:ro
+      - ./nginx/modsecurity/plugins/freemem-before.conf:/etc/modsecurity.d/owasp-crs/plugins/freemem-before.conf:ro
       - ./nginx/modsecurity/plugins/wordpress-rule-exclusions-config.conf:/etc/modsecurity.d/owasp-crs/plugins/wordpress-rule-exclusions-config.conf:ro
       - ./nginx/modsecurity/plugins/wordpress-rule-exclusions-before.conf:/etc/modsecurity.d/owasp-crs/plugins/wordpress-rule-exclusions-before.conf:ro
       - ./certbot/www:/var/www/certbot:ro
