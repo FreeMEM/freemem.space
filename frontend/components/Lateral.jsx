@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 
 export default function Lateral({ sitio, categorias, actual }) {
@@ -5,7 +6,7 @@ export default function Lateral({ sitio, categorias, actual }) {
     <aside className="lateral" aria-label="Sobre la bitácora">
       {sitio.retrato && (
         <figure className="retrato">
-          <img src={sitio.retrato.src} width={sitio.retrato.ancho} height={sitio.retrato.alto} alt="Un ojo pintado, la imagen de FreeMEM" loading="lazy" />
+          <Image src={sitio.retrato.src} width={sitio.retrato.ancho} height={sitio.retrato.alto} sizes="(max-width: 960px) 22rem, 20vw" alt="Un ojo pintado, la imagen de FreeMEM" />
         </figure>
       )}
       <h2>FreeMEM</h2>

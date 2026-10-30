@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Comentarios from '@/components/Comentarios'
@@ -86,15 +87,7 @@ export default async function Entrada({ params }) {
 
       {e.imagen && (
         <figure className="imagen-entrada">
-          <img
-            src={e.imagen.src}
-            srcSet={e.imagen.srcset || undefined}
-            sizes="100vw"
-            alt={e.imagen.alt}
-            width={e.imagen.ancho}
-            height={e.imagen.alto}
-            fetchPriority="high"
-          />
+          <Image src={e.imagen.src} sizes="100vw" alt={e.imagen.alt} width={e.imagen.ancho} height={e.imagen.alto} priority />
         </figure>
       )}
 

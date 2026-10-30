@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { formatoFecha, resumen, textoPlano } from '@/lib/contenido'
 
@@ -18,14 +19,13 @@ export default function Portada({ entrada }) {
       </div>
       {entrada.imagen && (
         <figure className="portada__imagen">
-          <img
+          <Image
             src={entrada.imagen.src}
-            srcSet={entrada.imagen.srcset || undefined}
             sizes="(max-width: 860px) 100vw, 42vw"
             alt={entrada.imagen.alt}
             width={entrada.imagen.ancho}
             height={entrada.imagen.alto}
-            fetchPriority="high"
+            priority
           />
         </figure>
       )}

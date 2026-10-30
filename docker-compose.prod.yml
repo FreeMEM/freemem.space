@@ -28,6 +28,11 @@ services:
     logging: *logs
     depends_on:
       - wordpress
+    # El optimizador de imágenes pide https://freemem.space/wp-content/uploads/…:
+    # dentro del CT ese nombre tiene que llegar al nginx de aquí, no dar la vuelta
+    # por la IP pública (cosmos no hace NAT loopback).
+    extra_hosts:
+      - "freemem.space:host-gateway"
     environment:
       - WORDPRESS_API_URL=http://nginx:8081/wp-json
       - NEXT_PUBLIC_SITE_URL=${WP_HOME:-https://freemem.space}

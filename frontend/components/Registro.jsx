@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { formatoDiaMes, resumen, textoPlano } from '@/lib/contenido'
 
@@ -7,7 +8,7 @@ function Apunte({ e }) {
     <li className="apunte">
       {e.imagen && (
         <Link href={href} className="apunte__imagen" tabIndex={-1} aria-hidden="true">
-          <img src={e.imagen.src} srcSet={e.imagen.srcset || undefined} sizes="(max-width: 960px) 100vw, 30vw" alt="" loading="lazy" decoding="async" />
+          <Image src={e.imagen.src} fill sizes="(max-width: 640px) 100vw, (max-width: 1400px) 40vw, 26rem" alt="" />
         </Link>
       )}
       <div className="apunte__meta">

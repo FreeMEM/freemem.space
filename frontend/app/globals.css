@@ -521,6 +521,8 @@ h4 {
 }
 
 .apunte__imagen {
+  position: relative;
+  display: block;
   aspect-ratio: 16 / 9;
   overflow: hidden;
   background: var(--papel-2);
