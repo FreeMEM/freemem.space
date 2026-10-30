@@ -27,6 +27,20 @@ const nextConfig = {
   },
   // En desarrollo el formulario de comentarios llama a /wp-json/ del propio
   // frontend; en producción eso lo enruta nginx.
+  // Next.js 15 mete siempre su módulo de polyfills (Array.prototype.at, flatMap,
+  // trimStart…) en el JS principal. Los navegadores de «browserslist» (Chrome 111,
+  // Safari 16.4…) ya los traen: son 12 KB que solo se descargan. Los navegadores
+  // viejos siguen teniendo polyfills-*.js, que Next carga aparte con nomodule.
+  webpack(config, { isServer }) {
+    if (!isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'next/dist/build/polyfills/polyfill-module': false,
+        '../build/polyfills/polyfill-module': false,
+      }
+    }
+    return config
+  },
   async rewrites() {
     if (process.env.NODE_ENV === 'production') return []
     const api = process.env.WORDPRESS_API_URL || 'http://localhost:8080/wp-json'
