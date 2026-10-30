@@ -1,0 +1,8 @@
+[Unit]
+Description=freemem.space: imágenes de nginx/ModSecurity, MariaDB, certbot y frontend al día
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/imagenes_actualizar.sh
+TimeoutStartSec=1800

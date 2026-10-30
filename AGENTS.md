@@ -27,6 +27,13 @@ De ahí salen las reglas:
   cierra `/wp/v2/users` y XML-RPC.
 - **El HTML de la base se limpia siempre** con DOMPurify en el frontend (`lib/contenido.js`).
 - **Nada de secretos en el repo**, que es público. Van en `.env` (ver `.env.example`).
+- **Todo se actualiza solo**: WordPress, plugins, temas y traducciones cada día; la
+  imagen de PHP los domingos; nginx con ModSecurity, MariaDB, certbot y el frontend
+  los lunes; el sistema del CT con unattended-upgrades. Las dos pasadas comprueban la
+  web y vuelven atrás si falla. La integridad diaria la recoge la alerta de cosmos.
+- **En producción, `docker compose` siempre con los dos ficheros**
+  (`-f docker-compose.yml -f docker-compose.prod.yml`): con uno solo, Docker recrea
+  la base y WordPress con otra configuración.
 
 ## Piezas
 
@@ -41,7 +48,9 @@ De ahí salen las reglas:
 | `frontend/` | Next.js 15 (App Router), CSS propio, sin librería de componentes |
 | `scripts/migrar.sh` | Migración única desde el sitio antiguo. Ya está hecha |
 | `scripts/wordpress_actualizar.sh` | Mantenimiento diario, el mismo de los WordPress de cosmos (copia del CT 105) |
-| `scripts/instalar-mantenimiento.sh` | Instala ese guion, WP-CLI y los temporizadores en el CT |
+| `scripts/imagenes_actualizar.sh` | Cada lunes: imágenes de nginx/ModSecurity, MariaDB y certbot, y frontend reconstruido; vuelve atrás si la web falla |
+| `scripts/instalar-mantenimiento.sh` | Instala los dos guiones, WP-CLI, los temporizadores y unattended-upgrades en el CT |
+| `.github/dependabot.yml` | Avisos de versiones nuevas de npm y Docker; se fusionan a mano |
 
 ## Frontend
 

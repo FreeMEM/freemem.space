@@ -1,0 +1,10 @@
+[Unit]
+Description=Semanal: imágenes de Docker al día
+
+[Timer]
+OnCalendar=Mon *-*-* 06:30:00
+RandomizedDelaySec=900
+Persistent=true
+
+[Install]
+WantedBy=timers.target
