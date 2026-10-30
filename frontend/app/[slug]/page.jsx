@@ -29,6 +29,8 @@ export default async function Entrada({ params }) {
   if (!e) notFound()
 
   const esEntrada = e.tipo === 'post'
+  // El currículum lo pinta el plugin Resume Builder: necesita el ancho entero
+  const esCurriculum = e.contenido.includes('rb-template-container')
   const { html, indice } = prepararContenido(e.contenido)
   const [relacionadas, comentarios] = await Promise.all([
     esEntrada ? getRelacionadas(e) : [],
@@ -82,7 +84,7 @@ export default async function Entrada({ params }) {
           )}
         </nav>
 
-        <div className="texto" dangerouslySetInnerHTML={{ __html: html }} />
+        <div className={`texto${esCurriculum ? ' texto--cv' : ''}`} dangerouslySetInnerHTML={{ __html: html }} />
 
         <aside className="al-lado" aria-label="Más de la bitácora">
           {relacionadas.length > 0 && (

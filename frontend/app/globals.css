@@ -1077,3 +1077,143 @@ h4 {
 .busqueda--grande input::placeholder {
   color: var(--tinta-suave);
 }
+
+/* ============ CURRÍCULUM (Resume Builder) ============ */
+
+.texto--cv {
+  grid-column: 1 / -1;
+}
+
+.texto--cv ~ .indice,
+.texto--cv ~ .al-lado {
+  display: none;
+}
+
+.texto--cv .rbt-header {
+  margin-bottom: 0.5rem;
+}
+
+.texto--cv .rbt-name {
+  font-family: var(--f-titulo);
+  font-size: var(--t-4);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.texto--cv .rbt-title {
+  font-family: var(--f-titulo);
+  font-size: var(--t-2);
+  color: var(--tinta-suave);
+  margin-top: 0.4rem;
+}
+
+.texto--cv .rbt-contact-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 2rem;
+  font-family: var(--f-titulo);
+  border-bottom: 3px solid var(--tinta);
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+
+.texto--cv .rbt-ci-block > div:empty {
+  display: none;
+}
+
+.texto--cv .rbt-body {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1fr) minmax(0, 2.4fr);
+  gap: calc(var(--hueco) * 2);
+}
+
+@media (max-width: 900px) {
+  .texto--cv .rbt-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.texto--cv .rbt-section-heading {
+  font-family: var(--f-titulo);
+  font-size: var(--t-2);
+  font-weight: 700;
+  color: var(--wb-azul);
+  margin: 1.5rem 0 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .texto--cv .rbt-section-heading {
+    color: var(--wb-naranja);
+  }
+}
+
+.texto--cv .rbt-column > :first-child .rbt-section-heading,
+.texto--cv .rbt-column > :first-child:is(.rb-template-default) > .rbt-section-heading {
+  margin-top: 0;
+}
+
+.texto--cv .rb-resume-skills-block {
+  border-bottom: 1px solid var(--linea);
+  padding: 0.6rem 0;
+}
+
+.texto--cv .rb-resume-skill-title {
+  font-family: var(--f-titulo);
+  font-weight: 700;
+}
+
+.texto--cv .rb-resume-skill-description {
+  font-size: 0.98rem;
+  color: var(--tinta-suave);
+  line-height: 1.5;
+}
+
+.texto--cv .rb-resume-skill-rating {
+  display: flex;
+  gap: 1px;
+  margin-top: 0.25rem;
+}
+
+.texto--cv .rb-resume-skill-rating svg {
+  width: 18px;
+  height: 18px;
+}
+
+.texto--cv .rb-rating-star-whole path {
+  fill: var(--wb-naranja);
+  stroke: var(--wb-naranja);
+}
+
+.texto--cv .rbt-history-block {
+  border-left: 3px solid var(--linea);
+  padding: 0 0 1.25rem 1.25rem;
+  margin-bottom: 1.25rem;
+  max-width: var(--medida);
+}
+
+.texto--cv .rbt-history-job-degree {
+  font-family: var(--f-titulo);
+  font-size: var(--t-1);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.texto--cv .rbt-history-place-time {
+  font-family: var(--f-titulo);
+  font-size: 0.95rem;
+  color: var(--tinta-suave);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0.25rem 0 0.6rem;
+}
+
+.texto--cv .rbt-history-company-school {
+  color: var(--tinta);
+  font-weight: 600;
+}
+
+.texto--cv .rbt-history-description {
+  font-size: 1.04rem;
+}
