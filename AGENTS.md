@@ -26,6 +26,13 @@ De ahí salen las reglas:
 - **La parte pública de WordPress no existe.** El mu-plugin redirige al frontend y
   cierra `/wp/v2/users` y XML-RPC.
 - **El HTML de la base se limpia siempre** con DOMPurify en el frontend (`lib/contenido.js`).
+- **Cabeceras del frontend en nginx**: CSP (scripts solo propios y de Google Analytics,
+  imágenes https, marcos solo de YouTube y Vimeo), COOP y HSTS; sin cabeceras de Next.js.
+  `/api/` da 404 desde fuera (la revalidación entra por la red interna, con secreto
+  comparado en tiempo constante). Comentarios: 6 por minuto y dirección. El optimizador
+  de imágenes solo acepta calidad 75 y fotos de `freemem.space/wp-content/uploads`.
+  Si se añade un servicio externo (un vídeo de otra plataforma, otro script), hay que
+  abrirlo en `$csp_paginas` de `nginx/site.conf`.
 - **Nada de secretos en el repo**, que es público. Van en `.env` (ver `.env.example`).
 - **Todo se actualiza solo**: WordPress, plugins, temas y traducciones cada día; la
   imagen de PHP los domingos; nginx con ModSecurity, MariaDB, certbot y el frontend
