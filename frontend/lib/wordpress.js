@@ -141,3 +141,15 @@ export async function getTodas(tipo = 'posts') {
   }
   return todas
 }
+
+/** Todas las entradas o páginas con su contenido, para llms-full.txt */
+export async function getTodasCompletas(tipo = 'posts') {
+  const todas = []
+  for (let pagina = 1; pagina < 50; pagina++) {
+    const { data, paginas } = await fetchWP(`/wp/v2/${tipo}?per_page=100&page=${pagina}&_embed=wp:term`, { revalidate: 3600 })
+    if (!data?.length) break
+    todas.push(...data.map(entrada))
+    if (pagina >= paginas) break
+  }
+  return todas
+}

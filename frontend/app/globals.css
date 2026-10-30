@@ -171,7 +171,14 @@ h4 {
   font-size: 0.98rem;
 }
 
+/* Algunos temas se escribieron en minúscula en WordPress («programación») */
+.temas a::first-letter,
+.lista-temas a::first-letter {
+  text-transform: uppercase;
+}
+
 .temas a {
+  display: inline-block;
   color: #fff;
   text-decoration: none;
   white-space: nowrap;
@@ -425,6 +432,7 @@ h4 {
 }
 
 .lista-temas a {
+  display: inline-block;
   color: var(--tinta);
   text-decoration: none;
   padding: 0.45rem 0;

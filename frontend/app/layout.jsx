@@ -15,6 +15,7 @@ export async function generateMetadata() {
     title: { default: sitio.nombre, template: `%s | ${sitio.nombre}` },
     description: sitio.descripcion,
     alternates: { types: { 'application/rss+xml': `${SITE_URL}/feed/` } },
+    twitter: { card: 'summary' },
     openGraph: { siteName: sitio.nombre, locale: 'es_ES', type: 'website' },
   }
 }

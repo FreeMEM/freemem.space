@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Comentarios from '@/components/Comentarios'
+import DatosEstructurados from '@/components/DatosEstructurados'
 import { getComentarios, getPorSlug, getRelacionadas, SITE_URL } from '@/lib/wordpress'
 import { formatoFecha, minutosLectura, prepararContenido, resumen, textoPlano } from '@/lib/contenido'
 
@@ -12,14 +13,21 @@ export async function generateMetadata({ params }) {
   return {
     title: textoPlano(e.titulo),
     description: descripcion,
-    alternates: { canonical: `${SITE_URL}/${e.slug}/` },
+    alternates: {
+      canonical: `${SITE_URL}/${e.slug}/`,
+      types: { 'text/markdown': `${SITE_URL}/${e.slug}/index.md` },
+    },
     openGraph: {
       type: e.tipo === 'post' ? 'article' : 'website',
       title: textoPlano(e.titulo),
       description: descripcion,
       publishedTime: e.fecha,
+      modifiedTime: e.modificada,
+      authors: [e.autor],
+      tags: e.etiquetas.map(t => t.nombre),
       images: e.imagen ? [{ url: e.imagen.src, width: e.imagen.ancho, height: e.imagen.alto }] : undefined,
     },
+    twitter: { card: e.imagen ? 'summary_large_image' : 'summary' },
   }
 }
 
@@ -37,8 +45,29 @@ export default async function Entrada({ params }) {
     esEntrada ? getComentarios(e.id) : [],
   ])
 
+  const url = `${SITE_URL}/${e.slug}/`
+  const ld = esEntrada && {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: textoPlano(e.titulo),
+    description: resumen(e.extracto || e.contenido, 200),
+    datePublished: e.fecha,
+    dateModified: e.modificada || e.fecha,
+    url,
+    mainEntityOfPage: url,
+    inLanguage: 'es-ES',
+    author: { '@type': 'Person', name: e.autor, url: `${SITE_URL}/la-bitacora-de-freemem/` },
+    publisher: { '@type': 'Person', name: 'Francisco Tapias Bravo', url: SITE_URL },
+    image: e.imagen?.src,
+    articleSection: e.categorias.map(c => c.nombre),
+    keywords: e.etiquetas.map(t => t.nombre).join(', ') || undefined,
+    wordCount: textoPlano(e.contenido).split(' ').length,
+    encoding: { '@type': 'MediaObject', encodingFormat: 'text/markdown', contentUrl: `${url}index.md` },
+  }
+
   return (
     <article>
+      {ld && <DatosEstructurados datos={ld} />}
       <header className="cabeza-entrada">
         {esEntrada && (
           <p className="cabeza-entrada__meta">
