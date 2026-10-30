@@ -1,3 +1,31 @@
+# El mismo entorno para WordPress y para WP-CLI: el wp-config.php de la imagen lee
+# WORDPRESS_CONFIG_EXTRA en cada carga, así que si WP-CLI no lo tiene, sus órdenes
+# corren sin DISALLOW_FILE_MODS ni las constantes del mu-plugin.
+x-wp-entorno: &wp-entorno
+  WORDPRESS_DB_HOST: db
+  WORDPRESS_DB_NAME: wordpress
+  WORDPRESS_DB_USER: wordpress
+  WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+  WORDPRESS_CONFIG_EXTRA: |
+    define('WP_HOME', getenv('WP_HOME') ?: 'http://localhost:8080');
+    define('WP_SITEURL', getenv('WP_HOME') ?: 'http://localhost:8080');
+    // Nada se instala ni se edita desde wp-admin: plugins, temas y núcleo
+    // solo cambian con WP-CLI (scripts/wordpress_actualizar.sh). Tras la
+    // intrusión de 2026 el PHP que escribe la web es lo primero que se cierra.
+    define('DISALLOW_FILE_EDIT', true);
+    define('DISALLOW_FILE_MODS', true);
+    define('AUTOMATIC_UPDATER_DISABLED', true);
+    define('WP_POST_REVISIONS', 20);
+    define('FREEMEM_FRONTEND_URL', getenv('FRONTEND_URL') ?: 'http://localhost:3000');
+    define('FREEMEM_REVALIDATE_SECRET', getenv('REVALIDATE_SECRET') ?: '');
+    define('FREEMEM_SMTP_USER', getenv('SMTP_USER') ?: '');
+    define('FREEMEM_SMTP_PASS', getenv('SMTP_PASS') ?: '');
+  WP_HOME: ${WP_HOME:-http://localhost:8080}
+  FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+  REVALIDATE_SECRET: ${REVALIDATE_SECRET:-}
+  SMTP_USER: ${SMTP_USER:-}
+  SMTP_PASS: ${SMTP_PASS:-}
+
 services:
   db:
     image: mariadb:11.4
@@ -25,30 +53,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_NAME: wordpress
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
-      WORDPRESS_CONFIG_EXTRA: |
-        define('WP_HOME', getenv('WP_HOME') ?: 'http://localhost:8080');
-        define('WP_SITEURL', getenv('WP_HOME') ?: 'http://localhost:8080');
-        // Nada se instala ni se edita desde wp-admin: plugins, temas y núcleo
-        // solo cambian con WP-CLI (scripts/wordpress_actualizar.sh). Tras la
-        // intrusión de 2026 el PHP que escribe la web es lo primero que se cierra.
-        define('DISALLOW_FILE_EDIT', true);
-        define('DISALLOW_FILE_MODS', true);
-        define('AUTOMATIC_UPDATER_DISABLED', true);
-        define('WP_POST_REVISIONS', 20);
-        define('FREEMEM_FRONTEND_URL', getenv('FRONTEND_URL') ?: 'http://localhost:3000');
-        define('FREEMEM_REVALIDATE_SECRET', getenv('REVALIDATE_SECRET') ?: '');
-        define('FREEMEM_SMTP_USER', getenv('SMTP_USER') ?: '');
-        define('FREEMEM_SMTP_PASS', getenv('SMTP_PASS') ?: '');
-      WP_HOME: ${WP_HOME:-http://localhost:8080}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
-      REVALIDATE_SECRET: ${REVALIDATE_SECRET:-}
-      SMTP_USER: ${SMTP_USER:-}
-      SMTP_PASS: ${SMTP_PASS:-}
+    environment: *wp-entorno
     volumes:
       - wp_data:/var/www/html
       - ./wordpress/mu-plugins:/var/www/html/wp-content/mu-plugins:ro
@@ -63,16 +68,7 @@ services:
     user: "33:33"
     depends_on:
       - db
-    environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_NAME: wordpress
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
-      WP_HOME: ${WP_HOME:-http://localhost:8080}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
-      REVALIDATE_SECRET: ${REVALIDATE_SECRET:-}
-      SMTP_USER: ${SMTP_USER:-}
-      SMTP_PASS: ${SMTP_PASS:-}
+    environment: *wp-entorno
     volumes:
       - wp_data:/var/www/html
       - ./wordpress/mu-plugins:/var/www/html/wp-content/mu-plugins:ro

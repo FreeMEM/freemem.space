@@ -8,6 +8,14 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Las constantes vienen de WORDPRESS_CONFIG_EXTRA (docker-compose.yml). Si alguna
+// falta, el sitio sigue: sin correo por hermes o sin avisar al frontend.
+foreach (['FREEMEM_SMTP_USER' => '', 'FREEMEM_SMTP_PASS' => '', 'FREEMEM_REVALIDATE_SECRET' => '', 'FREEMEM_FRONTEND_URL' => home_url()] as $c => $v) {
+    if (!defined($c)) {
+        define($c, $v);
+    }
+}
+
 // ============ CORREO ============
 
 // El correo sale por hermes (CT 100) a su IP interna: desde dentro de cosmos,
