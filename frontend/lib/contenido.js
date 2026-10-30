@@ -105,10 +105,22 @@ function slugTitulo(texto) {
  * Devuelve el HTML listo y el índice de sus h2 y h3. Los encabezados reciben un id
  * para poder enlazarlos desde el índice.
  */
+/**
+ * Muchas entradas empiezan sus apartados en h3 (o h4). Bajo el h1 del título eso es
+ * un salto de nivel para lectores de pantalla y buscadores: se suben todos para que
+ * el más alto quede en h2.
+ */
+function nivelarEncabezados(html) {
+  const niveles = [...html.matchAll(/<h([2-6])[\s>]/g)].map(m => Number(m[1]))
+  const sube = niveles.length ? Math.min(...niveles) - 2 : 0
+  if (sube <= 0) return html
+  return html.replace(/<(\/?)h([3-6])([\s>])/g, (_, cierre, n, resto) => `<${cierre}h${Math.max(2, Number(n) - sube)}${resto}`)
+}
+
 export function prepararContenido(html) {
   const indice = []
   const usados = new Set()
-  const listo = limpiar(codecolorer(codigoCrudo(youtube(html || '')))).replace(/<h([23])([^>]*)>([\s\S]*?)<\/h\1>/g, (todo, nivel, attrs, dentro) => {
+  const listo = nivelarEncabezados(limpiar(codecolorer(codigoCrudo(youtube(html || ''))))).replace(/<h([23])([^>]*)>([\s\S]*?)<\/h\1>/g, (todo, nivel, attrs, dentro) => {
     const texto = textoPlano(dentro)
     if (!texto) return todo
     let id = /id="([^"]+)"/.exec(attrs)?.[1] || slugTitulo(texto) || `seccion-${indice.length + 1}`
