@@ -17,6 +17,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 90s
 
   wordpress:
     image: wordpress:php8.3-fpm  # sin versión de WordPress: el núcleo vive en el volumen y lo actualiza WP-CLI; la etiqueta solo fija PHP
