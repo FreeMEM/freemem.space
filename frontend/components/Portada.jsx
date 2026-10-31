@@ -19,16 +19,20 @@ export default function Portada({ entrada }) {
       </div>
       {entrada.imagen && (
         <figure className="portada__imagen">
-          <Image
-            src={entrada.imagen.src}
-            sizes="(max-width: 860px) 100vw, 42vw"
-            alt={entrada.imagen.alt}
-            width={entrada.imagen.ancho}
-            height={entrada.imagen.alto}
-            priority
-            fetchPriority="high"
-            loading="eager"
-          />
+          {/* En móvil la imagen va arriba y es lo primero que se toca. Fuera del
+              tabulador y del lector: el enlace del título ya lleva al mismo sitio. */}
+          <Link href={href} tabIndex={-1} aria-hidden="true">
+            <Image
+              src={entrada.imagen.src}
+              sizes="(max-width: 860px) 100vw, 42vw"
+              alt={entrada.imagen.alt}
+              width={entrada.imagen.ancho}
+              height={entrada.imagen.alto}
+              priority
+              fetchPriority="high"
+              loading="eager"
+            />
+          </Link>
         </figure>
       )}
       <div className="cobre" aria-hidden="true">
