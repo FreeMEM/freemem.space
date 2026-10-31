@@ -139,7 +139,9 @@ motivos=()
 fuera() { grep -vxF -f <(printf '%s\n' $1 ''); }   # quita de stdin las líneas de la lista $1
 
 s=$(ws core verify-checksums 2>&1)
-grep -q '^Success' <<<"$s" || motivos+=("núcleo modificado")
+# Con el motivo va el fichero: el 30/10/2026 saltó una vez y no quedó rastro de cuál.
+grep -q '^Success' <<<"$s" ||
+  motivos+=("núcleo modificado: $(grep -E '^(Warning|Error):' <<<"$s" | grep -v 'File should not exist' | sed 's/^[A-Za-z]*: //' | head -10 | paste -sd ';')")
 x=$(sed -n 's/^Warning: File should not exist: //p' <<<"$s" | fuera "${NUCLEO_EXTRA_CONOCIDO:-}")
 [ -n "$x" ] && motivos+=("ficheros de más en el núcleo: $(echo $x)")
 
