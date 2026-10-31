@@ -18,6 +18,19 @@ function leer() {
   }
 }
 
+// Con las cookies bloqueadas el navegador tampoco deja guardar nada aquí: la
+// decisión no se recordaría y el aviso saldría en cada visita. Sin almacén no se
+// pregunta y no se mide, que es lo mismo que rechazar.
+function sePuedeGuardar() {
+  try {
+    localStorage.setItem(`${CLAVE}-prueba`, '1')
+    localStorage.removeItem(`${CLAVE}-prueba`)
+    return true
+  } catch {
+    return false
+  }
+}
+
 function cargarGoogle() {
   if (!GA_ID || window.gtag) return
   window.dataLayer = window.dataLayer || []
@@ -49,8 +62,9 @@ export default function Analitica() {
   useEffect(() => {
     const decision = leer()
     if (decision === 'si') cargarGoogle()
-    if (!decision && GA_ID) setPreguntar(true)
-    const abrir = () => setPreguntar(true)
+    const guardable = sePuedeGuardar()
+    if (!decision && GA_ID && guardable) setPreguntar(true)
+    const abrir = () => guardable && setPreguntar(true)
     window.addEventListener('freemem:cookies', abrir)
     return () => window.removeEventListener('freemem:cookies', abrir)
   }, [])
