@@ -30,7 +30,7 @@ x-wp-entorno: &wp-entorno
 
 services:
   db:
-    image: mariadb:11.4
+    image: mariadb:13.0
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
