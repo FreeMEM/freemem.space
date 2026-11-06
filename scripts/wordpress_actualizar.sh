@@ -73,17 +73,23 @@ if [ "$MODO" = docker ]; then
       fi
     fi
   fi
-  docker cp /usr/local/bin/wp "$WP":/tmp/wp >/dev/null || exit 1
-  trap 'docker exec "$WP" rm -rf /tmp/wp /tmp/wpcache' EXIT
-  w()  { docker exec -u www-data -e WP_CLI_CACHE_DIR=/tmp/wpcache "$WP" php /tmp/wp --path="$RAIZ" --no-color "$@"; }
+  # Rutas propias de cada ejecución: la pasada diaria y la de WP-Cron (cada 10 min)
+  # se solapan, y el 06/11/2026 la de WP-Cron borró al salir el wp-cli compartido
+  # a mitad de la diaria, que dio integridad=0 sin motivo.
+  WPCLI=/tmp/wp-$$; WPCACHE=/tmp/wpcache-$$
+  docker cp /usr/local/bin/wp "$WP":"$WPCLI" >/dev/null || exit 1
+  trap 'docker exec "$WP" rm -rf "$WPCLI" "$WPCACHE"' EXIT
+  w()  { docker exec -u www-data -e WP_CLI_CACHE_DIR="$WPCACHE" "$WP" php "$WPCLI" --path="$RAIZ" --no-color "$@"; }
   en() { docker exec "$WP" "$@"; }
 else
   RAIZ=$RUTA
-  trap 'rm -rf /tmp/wpcache-actualizar' EXIT
+  # Caché propia de cada ejecución: la pasada diaria y la de WP-Cron se solapan.
+  WPCACHE=/tmp/wpcache-actualizar-$$
+  trap 'rm -rf "$WPCACHE"' EXIT
   # El wp-config.php de freemem define ABSPATH sin comprobarlo: WP-CLI avisa en
   # cada orden. Es inofensivo y solo ensucia el registro.
   # setpriv y no runuser: runuser abre sesión PAM y llena el diario de líneas.
-  w()  { setpriv --reuid=www-data --regid=www-data --init-groups env HOME=/var/www WP_CLI_CACHE_DIR=/tmp/wpcache-actualizar php /usr/local/bin/wp --path="$RAIZ" --no-color "$@" 2> >(grep -v 'Constant ABSPATH already defined' >&2); }
+  w()  { setpriv --reuid=www-data --regid=www-data --init-groups env HOME=/var/www WP_CLI_CACHE_DIR="$WPCACHE" php /usr/local/bin/wp --path="$RAIZ" --no-color "$@" 2> >(grep -v 'Constant ABSPATH already defined' >&2); }
   en() { "$@"; }
 fi
 # Para mirar sin ejecutar el código de plugins y temas (por si son el problema).
